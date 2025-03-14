@@ -1,0 +1,51 @@
+﻿@{
+    ViewBag.Title = "Ürün Arama";
+}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<input type="text" id="txtUrunAd" placeholder="Ürün Adı arama..." />
+<button onclick="return UrunBilgiGetir();">Bilgi Getir</button>
+<button onclick="return EkranTemizle();">Temizle</button>
+
+<div id="sonuc"></div>
+
+<script type="text/javascript">
+    function EkranTemizle() {
+        $('#txtUrunAd').val('');
+        $('#sonuc').html('');
+        $('#txtUrunAd').focus();
+    }
+
+    $('#txtUrunAd').on('input', function () {
+        UrunBilgiGetir();
+    });
+
+    function UrunBilgiGetir() {
+        var qTextboxDeger = $('#txtUrunAd').val();
+        if (qTextboxDeger != '') {
+            $.ajax({
+                type: "POST",
+                url: "/Products/SyncUrunGetir",
+                // dataType: "json", 
+                // contentType: 'application/json; charset=utf-8', 
+				// // --- dataType ve contentType'in belirtilmesine gerek yok. 
+				// Bu propertyler belirtildiği zaman Ajax, .NET Core'da controller metoduna parametreyi aktaramıyor.
+                data: { qUrunAdi: $('#txtUrunAd').val() },
+                success: function (result) {
+                    $('#sonuc').html('');
+                    if (result.length === 0) {
+                        $('#sonuc').html('Kayıt bulunamadı');
+                    } else {
+                        $.each(result, function (index, item) {
+                            $('#sonuc').append('<a href="#">' + item + '</a><br />');
+                        });
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert("error");
+                }
+            });
+        }
+    }
+</script>
